@@ -1,18 +1,16 @@
 FROM python:3.9-slim
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
+# Step 1: Install system dependencies (if needed)
+RUN apt-get update -y && \
+    apt-get install -y \
     wget \
     curl \
     unzip \
-    ffmpeg \
-    chromium \
-    chromium-driver \
-    PyYAML \
-    && rm -rf /var/lib/apt/lists/*
+    ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Python packages
-RUN pip install --no-cache-dir yt-dlp selenium requests
+# Step 2: Install Python dependencies
+RUN pip install --no-cache-dir requests PyYAML
 
 # Set environment variables
 ENV CHROME_BIN=/usr/bin/chromium \
