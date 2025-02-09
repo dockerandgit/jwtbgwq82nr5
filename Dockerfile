@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     chromium \
     chromium-driver \
+    json \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages
@@ -25,4 +26,4 @@ VOLUME /config
 VOLUME /data
 
 # Run the script from the mapped config directory
-CMD ["python", "/config/archive_trailers.py"]
+CMD ["python", "/config/script.py"]
