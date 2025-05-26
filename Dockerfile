@@ -20,7 +20,6 @@ RUN pip install --no-cache-dir \
 ENV CHROME_BIN=/usr/bin/chromium \
     CHROMEDRIVER_BIN=/usr/bin/chromedriver
 
-WORKDIR /app
 VOLUME /config
 VOLUME /data
 
