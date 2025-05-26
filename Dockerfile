@@ -1,70 +1,63 @@
-FROM debian:bullseye-slim
+# Use official Python 3.10 slim image
+FROM python:3.10-slim
 
-# Install necessary dependencies
+# Set environment variable for Chrome version
+ARG CHROME_VERSION=112.0.5615.49
+
+# Install dependencies for Chrome and ChromeDriver
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     gnupg \
     ca-certificates \
     fonts-liberation \
-    libappindicator3-1 \
-    libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
-    libc6 \
-    libcairo2 \
     libcups2 \
-    libdbus-1-3 \
-    libexpat1 \
-    libfontconfig1 \
-    libgbm1 \
-    libgcc1 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libstdc++6 \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
+    libdrm2 \
+    libxkbcommon0 \
     libxcomposite1 \
-    libxcursor1 \
     libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
     libxrandr2 \
-    libxrender1 \
+    libgbm1 \
+    libasound2 \
+    libpangocairo-1.0-0 \
+    libpango-1.0-0 \
+    libxcb1 \
+    libx11-xcb1 \
+    libxshmfence1 \
+    libnss3 \
     libxss1 \
     libxtst6 \
-    lsb-release \
-    xdg-utils \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Set environment variables
-ENV CHROME_VERSION=112.0.5615.49 \
-    CHROMEDRIVER_VERSION=112.0.5615.49 \
-    CHROME_BIN=/usr/bin/google-chrome \
-    CHROMEDRIVER_BIN=/usr/local/bin/chromedriver
-
-# Install Google Chrome
-RUN wget -O /tmp/google-chrome.deb "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}-1_amd64.deb" && \
-    apt-get update && \
-    apt-get install -y /tmp/google-chrome.deb && \
+# Install Google Chrome 112
+RUN wget -O /tmp/google-chrome.deb "https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}-1_amd64.deb" && \
+    apt-get update && apt-get install -y /tmp/google-chrome.deb && \
     rm /tmp/google-chrome.deb && \
     rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver
-RUN wget -O /tmp/chromedriver_linux64.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && \
-    unzip /tmp/chromedriver_linux64.zip -d /usr/local/bin/ && \
+# Install matching ChromeDriver 112
+RUN wget https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip && \
+    unzip chromedriver_linux64.zip && \
+    mv chromedriver /usr/local/bin/chromedriver && \
     chmod +x /usr/local/bin/chromedriver && \
-    rm /tmp/chromedriver_linux64.zip
+    rm chromedriver_linux64.zip
+
+# Install Python Selenium 4.9.0
+RUN pip install selenium==4.9.0
+
+# Create working directory
+WORKDIR /app
 
 
-# Define volumes for config and data
+# Define environment variables for Chrome
+ENV CHROME_VERSION=112.0.5615.49
+ENV CHROME_BIN=/usr/local/bin/google-chrome-stable
+ENV CHROMEDRIVER_BIN=/usr/local/bin/chromedriver
+
+# Define volumes for external config and data mapping
 VOLUME /config
 VOLUME /data
 
