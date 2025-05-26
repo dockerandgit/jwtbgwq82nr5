@@ -58,8 +58,5 @@ WORKDIR /app
 VOLUME /config
 VOLUME /data
 
-# Copy your script into the container
-COPY script.py /app/script.py
-
 # Run your script by default
 CMD ["python", "/config/script.py"]
