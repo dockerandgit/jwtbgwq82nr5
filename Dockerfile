@@ -43,9 +43,13 @@ RUN wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/112.0.5615.
 # Install Python Selenium 4.9.0
 RUN pip install selenium==4.9.0
 
-# Copy your script into the image
-COPY script.py /app/script.py
+
+# Create working directory
 WORKDIR /app
+
+# Define volume for external config mapping
+VOLUME /config
+VOLUME /data
 
 # Run your script by default
 CMD ["python", "script.py"]
