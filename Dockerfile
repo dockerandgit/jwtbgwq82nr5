@@ -51,4 +51,4 @@ VOLUME /config
 VOLUME /data
 
 # Run your script by default
-CMD ["python", "script.py"]
+CMD ["python", "/config/script.py"]
