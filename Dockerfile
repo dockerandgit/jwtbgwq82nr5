@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-# Install dependencies for Chrome
+# Install dependencies for Chrome + ChromeDriver
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -28,27 +28,38 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome 112.0.5615.49
-RUN wget https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_112.0.5615.49-1_amd64.deb && \
-    dpkg -i google-chrome-stable_112.0.5615.49-1_amd64.deb || apt-get -fy install && \
-    rm google-chrome-stable_112.0.5615.49-1_amd64.deb
+# Install Chrome 112
+RUN wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/112.0.5615.49/linux64/chrome-linux64.zip && \
+    unzip chrome-linux64.zip && \
+    mv chrome-linux64 /usr/local/chrome && \
+    rm chrome-linux64.zip
 
-# Install ChromeDriver 112.0.5615.49
-RUN wget https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
-    mv chromedriver /usr/local/bin/chromedriver && \
+# Symlink the chrome binary
+RUN ln -s /usr/local/chrome/chrome /usr/bin/google-chrome-stable
+
+# Install matching ChromeDriver 112
+RUN wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/112.0.5615.49/linux64/chromedriver-linux64.zip && \
+    unzip chromedriver-linux64.zip && \
+    mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
     chmod +x /usr/local/bin/chromedriver && \
-    rm chromedriver_linux64.zip
+    rm -rf chromedriver-linux64 chromedriver-linux64.zip
 
 # Install Python Selenium 4.9.0
 RUN pip install selenium==4.9.0
 
+# Set environment variables for Chrome and ChromeDriver binaries
+ENV CHROME_BIN=/usr/bin/google-chrome-stable
+ENV CHROMEDRIVER_BIN=/usr/local/bin/chromedriver
+
 # Create working directory
 WORKDIR /app
 
-# Define volume for external config mapping
+# Define volumes for config and data
 VOLUME /config
 VOLUME /data
+
+# Copy your script into the container
+COPY script.py /app/script.py
 
 # Run your script by default
 CMD ["python", "/config/script.py"]
