@@ -1,52 +1,51 @@
 FROM python:3.10-slim
 
-# Install dependencies for Chrome and ChromeDriver
+# Install dependencies for Chrome + ChromeDriver
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     gnupg \
     ca-certificates \
     fonts-liberation \
-    libnss3 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxi6 \
-    libxtst6 \
-    libatk1.0-0 \
     libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    libxss1 \
-    libasound2 \
+    libatk1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
     libgbm1 \
-    --no-install-recommends
+    libasound2 \
+    libpangocairo-1.0-0 \
+    libpango-1.0-0 \
+    libxcb1 \
+    libx11-xcb1 \
+    libxshmfence1 \
+    libnss3 \
+    libxss1 \
+    libxtst6 \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install specific Chrome version 112.0.5615.49 (example)
+# Install Chrome 112
 RUN wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_112.0.5615.49-1_amd64.deb && \
-    dpkg -i google-chrome-stable_112.0.5615.49-1_amd64.deb || apt-get -f install -y && \
+    dpkg -i google-chrome-stable_112.0.5615.49-1_amd64.deb || apt-get -fy install && \
     rm google-chrome-stable_112.0.5615.49-1_amd64.deb
 
-# Install ChromeDriver 112.0.5615.49
-RUN wget https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
-    mv chromedriver /usr/local/bin/chromedriver && \
+# Install matching ChromeDriver 112
+RUN wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/112.0.5615.49/linux64/chromedriver-linux64.zip && \
+    unzip chromedriver-linux64.zip && \
+    mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
     chmod +x /usr/local/bin/chromedriver && \
-    rm chromedriver_linux64.zip
+    rm -rf chromedriver-linux64 chromedriver-linux64.zip
 
-# Install Python selenium package
-RUN pip install --no-cache-dir selenium
+# Install Python Selenium 4.9.0
+RUN pip install selenium==4.9.0
 
-# Copy your scraper code in
-COPY . /app
+# Copy your script into the image
+COPY script.py /app/script.py
 WORKDIR /app
 
-# Set environment variables for Chrome and ChromeDriver, if your script needs them
-ENV CHROME_BIN=/usr/bin/google-chrome
-ENV CHROMEDRIVER_BIN=/usr/local/bin/chromedriver
-
-# Define volumes for external mapping
-VOLUME /config
-VOLUME /data
-
+# Run your script by default
 CMD ["python", "script.py"]
