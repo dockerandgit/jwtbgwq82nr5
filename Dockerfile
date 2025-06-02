@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.9-slim
 
 # Install zstandard
 RUN pip install --no-cache-dir zstandard
@@ -8,7 +8,6 @@ WORKDIR /app
 
 # Define volume for external config mapping
 VOLUME /config
-VOLUME /data
 VOLUME /archive
 
 # Run the script from the mapped config directory
