@@ -1,14 +1,22 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
-# Install zstandard
-RUN pip install --no-cache-dir zstandard
+# Install OS deps
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      unzip cron \
+ && rm -rf /var/lib/apt/lists/*
 
-# Create working directory
-WORKDIR /app
+# Install Python deps
+RUN pip install --no-cache-dir psycopg2-binary requests
 
-# Define volume for external config mapping
-VOLUME /config
-VOLUME /archive
+# Expose where we store our state
+VOLUME ["/config"]
 
-# Run the script from the mapped config directory
-CMD ["python", "/config/script.py"]
+# Defaults for DB connection & notify
+ENV POSTGRES_HOST=db \
+    POSTGRES_PORT=5432 \
+    POSTGRES_DB=fda \
+    NOTIFY_SCRIPT=/usr/local/emhttp/webGui/scripts/notify
+
+ENTRYPOINT ["/scripts/entrypoint.sh"]
+
