@@ -18,5 +18,5 @@ ENV POSTGRES_HOST=db \
     POSTGRES_DB=fda \
     NOTIFY_SCRIPT=/usr/local/emhttp/webGui/scripts/notify
 
-ENTRYPOINT ["/config/scripts/entrypoint.sh"]
+ENTRYPOINT ["/config/scripts/update_db.py"]
 
